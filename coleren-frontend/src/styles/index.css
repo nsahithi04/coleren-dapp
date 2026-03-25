@@ -1,7 +1,12 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
+
+* {
+  font-family: "Quicksand", sans-serif;
+}
 
 body {
-  font-family: sans-serif;
+  font-family: "Quicksand", sans-serif;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -15,8 +20,8 @@ body {
   box-sizing: border-box;
   min-width: 0;
 }
-
 input:focus,
-textarea:focus {
-  outline: 2px solid plum;
+textarea:focus,
+select {
+  outline: none;
 }

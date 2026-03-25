@@ -1,39 +1,24 @@
-# dependencies
-node_modules/
-
-# production build
-dist/
-build/
-output/
-
-# environment variables
-.env
-.env.local
-.env.development
-.env.production
-
-# logs
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# OS files
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-Thumbs.db
-
-# editor / IDE
-.vscode/
-.idea/
-
-# testing
-coverage/
-
-# cache
-.cache/
-.parcel-cache/
-
-# misc
-*.log
-
-# webpack
-stats.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
