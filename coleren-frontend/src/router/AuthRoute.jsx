@@ -7,7 +7,8 @@ export default function AuthRoute({ children }) {
     (state) => state.user.isPendingOnboarding,
   );
 
+  if (!isAuthenticated) return children;
   if (isPendingOnboarding) return children;
 
-  return isAuthenticated ? <Navigate to="/home" replace /> : children;
+  return <Navigate to="/GettingStarted" replace />;
 }

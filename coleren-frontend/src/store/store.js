@@ -9,31 +9,47 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-
-import storage from "redux-persist/es/storage"; // localStorage
-import storageSession from "redux-persist/es/storage/session"; // sessionStorage
-
+import storage from "redux-persist/es/storage";
+import storageSession from "redux-persist/es/storage/session";
 import userReducer from "./userSlice";
+import sequenceReducer from "./sequenceSlice";
 
-const rememberMe = localStorage.getItem("rememberMe") === "true";
-
-const userPersistConfig = {
-  key: "user",
-  storage: rememberMe ? storage : storageSession,
+const getStorage = () => {
+  if (typeof window === "undefined") return storageSession;
+  return localStorage.getItem("rememberMe") === "true"
+    ? storage
+    : storageSession;
 };
 
-const rootReducer = combineReducers({
-  user: persistReducer(userPersistConfig, userReducer),
-});
+export const buildStore = () => {
+  const userPersistConfig = {
+    key: "user",
+    storage: getStorage(),
+  };
+  const sequencePersistConfig = {
+    key: "sequence",
+    storage: storage,
+  };
 
-export const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
-});
+  const rootReducer = combineReducers({
+    user: persistReducer(userPersistConfig, userReducer),
+    sequence: persistReducer(sequencePersistConfig, sequenceReducer),
+  });
 
-export const persistor = persistStore(store);
+  const store = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+  });
+
+  const persistor = persistStore(store);
+  return { store, persistor };
+};
+
+const { store, persistor } = buildStore();
+
+export { store, persistor };

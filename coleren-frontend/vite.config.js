@@ -19,8 +19,10 @@ export default defineConfig({
     hmr: {
       overlay: true,
     },
+    host: true,
     watch: {
       usePolling: true,
+      interval: 100,
     },
   },
 
