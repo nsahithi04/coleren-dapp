@@ -1,11 +1,13 @@
 import InviteDrop from "@/components/common/inviteDropdown";
 import MultiTagInput from "@/components/common/MultiTagInput";
 import CounterControl from "../../components/common/CounterControl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 export default function Rules() {
-  const [tags, setTags] = useState([]);
+  const { type } = useParams();
   const [rule, setRule] = useState({
+    sequenceType: "",
     type: "",
     operator: "",
     tags: [],
@@ -50,11 +52,28 @@ export default function Rules() {
 
   const TIME_UNITS = ["Days", "Weeks", "Months", "Years"];
 
+  useEffect(() => {
+    if (type) {
+      setRule((prev) => ({
+        ...prev,
+        sequenceType: type,
+      }));
+    }
+  }, [type]);
+
   const updateRule = (key, value) => {
     setRule((prev) => ({
       ...prev,
       [key]: value,
     }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      console.log(rule);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -133,7 +152,10 @@ export default function Rules() {
         feedback requests.
       </div>
 
-      <button className="w-fit bg-[#25C766] text-white py-3 px-5 rounded-lg text-md font-semibold">
+      <button
+        onClick={handleSubmit}
+        className="w-fit bg-[#25C766] text-white py-3 px-5 rounded-lg text-md font-semibold"
+      >
         Submit
       </button>
     </div>

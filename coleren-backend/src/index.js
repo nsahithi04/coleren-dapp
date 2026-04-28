@@ -9,6 +9,7 @@ import userRoutes from "./routes/userRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
+import meetingRoutes from "./routes/meetingRoutes.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/team", teamRoutes);
+app.use("/api/meeting", meetingRoutes);
 
 app.use(errorHandler);
 

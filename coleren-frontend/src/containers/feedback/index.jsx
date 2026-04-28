@@ -66,7 +66,7 @@ export default function Feedback() {
             Feedback
           </h1>
 
-          <div className="flex gap-4 mb-5 p-1.5 bg-[#E7FCEF] rounded-lg w-fit shadow-md">
+          <div className="flex gap-4 mb-5 p-1.5 bg-[#E7FCEF] rounded-lg w-fit shadow-md cursor-pointer">
             <div
               className={`p-2 ${activeTab === "all" ? activeClass : ""}`}
               onClick={() => setActiveTab("all")}

@@ -1,9 +1,12 @@
 import DashboardLayout from "../../layout/dashboardLayout";
 import { useEffect, useState } from "react";
 import { auth } from "../../../firebase";
-import { dashboard } from "../../services/dashboardService";
+import { dashboard, recentActity } from "../../services/dashboardService";
 import { onAuthStateChanged } from "firebase/auth";
 import ScoreCard from "@/components/dashboard/scoreCard";
+import SalesCallIcon from "../../components/common/icons/salesCall";
+import InterviewIcon from "../../components/common/icons/interview";
+import logo from "../../components/common/icons/logo.svg";
 
 const getScoreType = (value, strong = 7, avg = 4) => {
   if (value >= strong) return "strong";
@@ -31,6 +34,7 @@ const SCORE_CONFIG = {
 
 export default function Dashboard() {
   const [displayData, setDisplayData] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [activeTab, setActiveTab] = useState("production");
 
   useEffect(() => {
@@ -39,6 +43,12 @@ export default function Dashboard() {
       try {
         const token = await firebaseUser.getIdToken();
         const data = await dashboard(token);
+        const activityData = await recentActity(token);
+
+        console.log(activityData);
+
+        setDisplayData(data);
+        setActivity(activityData);
         setDisplayData(data);
       } catch (err) {
         console.error(err);
@@ -214,15 +224,41 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-2 gap-5">
-            <div className="w-full bg-white shadow-md rounded-xl border border-gray-100 p-5">
-              <p className="text-sm text-gray-500 mb-4">
-                Representative Scores
-              </p>
+            <div className="w-full bg-white shadow-md rounded-xl border border-gray-100 px-10 py-7">
+              <div className="text-xl mb-4 font-semibold pb-5 grid grid-cols-[auto_1fr] gap-5 items-center">
+                Conversation Trends{" "}
+                <img src={logo} alt="Logo" className="w-10" />
+              </div>
             </div>
-            <div className="w-full bg-white shadow-md rounded-xl border border-gray-100 p-5">
-              <p className="text-sm text-gray-500 mb-4">
-                Representative Scores
-              </p>
+            <div className="w-full bg-white shadow-md rounded-xl border border-gray-100 px-10 py-7">
+              <p className="text-xl mb-4 font-semibold pb-5">Recent activity</p>
+              <div>
+                {activity.map((item) => (
+                  <div
+                    key={item._id}
+                    className="grid grid-cols-[auto_1fr] gap-5 mb-2 border-b border-[#EFEFEF] pb-2 items-center"
+                  >
+                    {item.meetingType === "SALES CALL" ? (
+                      <SalesCallIcon />
+                    ) : (
+                      <InterviewIcon />
+                    )}
+
+                    <div className="grid grid-rows-[1fr_auto]">
+                      <p className=" text-lg font-semibold">
+                        {item.meetingType === "SALES CALL"
+                          ? "Sales Conversation"
+                          : "Representative Interview"}{" "}
+                        for{" "}
+                        <span className="text-[#24BC61]">{item.product}</span>
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {item.company} • from {item.representativeName}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

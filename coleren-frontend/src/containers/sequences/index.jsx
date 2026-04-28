@@ -62,9 +62,7 @@ export default function Sequences() {
           </button>
         </div>
 
-        {/* CONTENT */}
         <div className="bg-white p-10 rounded-xl flex-1">
-          {/* TABS */}
           <div className="flex gap-2 mb-6 bg-[#E7FCEF] p-1 rounded-md w-fit">
             <button
               onClick={() => navigate(`/sequences/${activeType}/overview`)}
