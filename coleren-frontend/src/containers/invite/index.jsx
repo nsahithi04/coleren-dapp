@@ -1,17 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InviteDrop from "@/components/common/inviteDropdown";
+import { inviteMembers } from "@/services/teamService";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../firebase";
 
-const ROLES = [
-  "Product",
-  "Engineering",
-  "Design",
-  "Marketing",
-  "Sales",
-  "Operations",
-  "Other",
-];
+const ROLES = ["Product", "Sales"];
 
-const ACCESS = ["Viewer", "Editor", "Admin"];
+const ACCESS = ["Viewer", "Admin"];
 
 const emptyRow = () => ({
   email: "",
@@ -20,7 +15,20 @@ const emptyRow = () => ({
 });
 
 export default function Invite() {
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([emptyRow()]);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) return;
+      const t = await firebaseUser.getIdToken();
+      setToken(t);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const updateRow = (index, field, value) => {
     setRows((prev) =>
@@ -40,8 +48,16 @@ export default function Invite() {
     });
   };
 
-  const handleSend = () => {
-    console.log(rows);
+  const handleSend = async () => {
+    try {
+      await inviteMembers(rows, token);
+
+      setSuccessOpen(true);
+
+      setRows([emptyRow()]);
+    } catch (err) {
+      setErrorMessage(err.message);
+    }
   };
 
   return (
@@ -114,6 +130,45 @@ export default function Invite() {
           </button>
         </div>
       </div>
+
+      {successOpen && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
+            <h2 className="text-2xl font-semibold text-[#062732] mb-2">
+              Invites Sent
+            </h2>
+
+            <p className="text-gray-500 mb-6">
+              Team members were added successfully.
+            </p>
+
+            <button
+              onClick={() => setSuccessOpen(false)}
+              className="bg-[#25C766] text-white px-6 py-3 rounded-lg"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+      {errorMessage && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
+            <h2 className="text-2xl font-semibold text-red-500 mb-2 ">
+              Access Denied
+            </h2>
+
+            <p className="text-gray-500 mb-6">{errorMessage}</p>
+
+            <button
+              onClick={() => setErrorMessage("")}
+              className="bg-red-500 text-white px-6 py-3 rounded-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

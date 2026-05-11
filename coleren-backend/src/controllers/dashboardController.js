@@ -118,18 +118,40 @@ export const getDashboard = async (req, res) => {
         ? 0
         : Number((totalConversionsAllReps / numberOfReps).toFixed(1));
 
+    const monthlyStats = Array.from({ length: 12 }, (_, index) => {
+      const monthStart = new Date(now.getFullYear(), index, 1);
+
+      const monthEnd = new Date(now.getFullYear(), index + 1, 0, 23, 59, 59);
+
+      const monthLeads = leads.filter(
+        (lead) => lead.createdAt >= monthStart && lead.createdAt <= monthEnd,
+      );
+
+      const monthConverted = monthLeads.filter(
+        (lead) => lead.outcome === "WIN",
+      );
+
+      return {
+        month: monthStart.toLocaleString("default", {
+          month: "short",
+        }),
+
+        leads: monthLeads.length,
+
+        converted: monthConverted.length,
+      };
+    });
+
     res.json({
       product: {
         productMarketScore: avgProductMarketScore,
         competitorScore: avgCompetitorScore,
         conversionRate,
       },
-
       sales: {
         totalLeads,
         convertedLeads,
       },
-
       monthly: {
         leads: {
           current: monthlyLeads,
@@ -140,8 +162,20 @@ export const getDashboard = async (req, res) => {
           growth: conversionGrowth,
         },
       },
+      avgConversionsPerRep,
 
-      avgConversionsPerRep: avgConversionsPerRep,
+      details: {
+        leads: leads.slice(0, 10),
+        products: products.slice(0, 10),
+        thisMonthLeads: thisMonthLeads.slice(0, 10),
+        lastMonthLeads: lastMonthLeads.slice(0, 10),
+        thisMonthConverted: thisMonthConverted.slice(0, 10),
+        lastMonthConverted: lastMonthConverted.slice(0, 10),
+        totalLeadsConverted: leads
+          .filter((l) => l.outcome === "WIN")
+          .slice(0, 10),
+        yearlyStats: monthlyStats,
+      },
     });
   } catch (err) {
     console.error(err);

@@ -7,6 +7,8 @@ import ScoreCard from "@/components/dashboard/scoreCard";
 import SalesCallIcon from "../../components/common/icons/salesCall";
 import InterviewIcon from "../../components/common/icons/interview";
 import logo from "../../components/common/icons/logo.svg";
+import ChatBox from "../../components/common/chatBox";
+import Details from "../../components/dashboard/detailsCard";
 
 const getScoreType = (value, strong = 7, avg = 4) => {
   if (value >= strong) return "strong";
@@ -36,6 +38,8 @@ export default function Dashboard() {
   const [displayData, setDisplayData] = useState(null);
   const [activity, setActivity] = useState([]);
   const [activeTab, setActiveTab] = useState("production");
+  const [selectedCard, setSelectedCard] = useState("productMarket");
+  const [view, setView] = useState("chat");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -45,6 +49,7 @@ export default function Dashboard() {
         const data = await dashboard(token);
         const activityData = await recentActity(token);
 
+        console.log(data);
         console.log(activityData);
 
         setDisplayData(data);
@@ -83,9 +88,49 @@ export default function Dashboard() {
       ? "bg-white shadow-lg py-2 px-4 w-full text-center rounded-md text-[#114354]"
       : "text-white px-2";
 
+  const handleSelect = (key) => {
+    setSelectedCard(key);
+    setView("details");
+  };
+
+  const getSelectedDetails = () => {
+    if (!displayData || !selectedCard) return null;
+
+    switch (selectedCard) {
+      case "productMarket":
+        return displayData.details?.products;
+
+      case "competitor":
+        return displayData.details?.products;
+
+      case "conversion":
+        return displayData.details?.yearlyStats;
+
+      case "Leads":
+        return displayData.details?.leads;
+
+      case "LeadsConversion":
+        return displayData.details?.totalLeadsConverted;
+
+      case "MonthlyLeads":
+        return displayData.details?.thisMonthLeads;
+
+      case "MonthlyConversions":
+        return displayData.details?.thisMonthConverted;
+
+      case "Leadsconverted":
+        return displayData.details?.thisMonthConverted;
+
+      default:
+        return null;
+    }
+  };
+
+  const selectedDetails = getSelectedDetails();
+
   return (
     <DashboardLayout>
-      <div className="flex gap-5 h-full w-full p-10">
+      <div className="grid grid-cols-[3fr_1fr] gap-5 min-h-screen p-5">
         <div className="grid grid-rows-[auto_auto_1fr] gap-5 w-full">
           <div className="grid grid-cols-[auto_1fr] gap-10 items-center">
             <span className="text-xl font-semibold text-[#062732]">
@@ -127,7 +172,10 @@ export default function Dashboard() {
                     SCORE_CONFIG.product.avg,
                   )}
                   responses="View details"
+                  isActive={selectedCard === "productMarket"}
+                  onClick={() => handleSelect("productMarket")}
                 />
+
                 <ScoreCard
                   title="Competitor Score"
                   subtitle="Competitive product"
@@ -141,10 +189,12 @@ export default function Dashboard() {
                     SCORE_CONFIG.product.avg,
                   )}
                   responses="View details"
+                  onClick={() => handleSelect("competitor")}
+                  isActive={selectedCard === "competitor"}
                 />
                 <ScoreCard
                   title="Conversion Rate"
-                  subtitle={`Demo converted to Sale ${label}`}
+                  subtitle={`Total leads converted ${label}`}
                   score={conversionRate}
                   value={`${conversionRate}%`}
                   max={100}
@@ -155,6 +205,8 @@ export default function Dashboard() {
                     SCORE_CONFIG.conversion.avg,
                   )}
                   responses="View details"
+                  onClick={() => handleSelect("conversion")}
+                  isActive={selectedCard === "conversion"}
                 />
               </div>
             )}
@@ -170,12 +222,14 @@ export default function Dashboard() {
                   displayType="bars"
                   type={getScoreType(totalLeads, 70, 30)}
                   responses="View details"
+                  onClick={() => handleSelect("Leads")}
+                  isActive={selectedCard === "Leads"}
                 />
                 <ScoreCard
-                  title="Conversion Rate"
+                  title="Total Leads Converted"
                   subtitle="Leads converted"
                   score={convertedLeads}
-                  value={`${convertedLeads.toFixed(0)}%`}
+                  value={`${convertedLeads.toFixed(0)}`}
                   max={100}
                   displayType="ring"
                   type={getScoreType(
@@ -184,9 +238,11 @@ export default function Dashboard() {
                     SCORE_CONFIG.conversion.avg,
                   )}
                   responses="View details"
+                  onClick={() => handleSelect("LeadsConversion")}
+                  isActive={selectedCard === "LeadsConversion"}
                 />
                 <ScoreCard
-                  title="Monthly Leads"
+                  title=" Leads"
                   subtitle={`for ${label}`}
                   score={leadsmonthly}
                   value={leadsmonthly}
@@ -194,9 +250,11 @@ export default function Dashboard() {
                   displayType="bars"
                   type={getGrowthType(growthleads)}
                   responses={getGrowthLabel(growthleads)}
+                  onClick={() => handleSelect("MonthlyLeads")}
+                  isActive={selectedCard === "MonthlyLeads"}
                 />
                 <ScoreCard
-                  title="Monthly Conversions"
+                  title=" Conversions"
                   subtitle={`for ${label}`}
                   score={convertedmonthly}
                   value={convertedmonthly}
@@ -204,10 +262,12 @@ export default function Dashboard() {
                   displayType="bars"
                   type={getGrowthType(growthconverted)}
                   responses={getGrowthLabel(growthconverted)}
+                  onClick={() => handleSelect("MonthlyConversions")}
+                  isActive={selectedCard === "MonthlyConversions"}
                 />
                 <ScoreCard
                   title="Conversions per rep"
-                  subtitle="Avg. leads converted per rep"
+                  subtitle={`Avg. leads converted per rep for ${label}`}
                   score={avgConversionsPerRep}
                   value={avgConversionsPerRep.toFixed(1)}
                   max={10}
@@ -218,6 +278,8 @@ export default function Dashboard() {
                     SCORE_CONFIG.rep.avg,
                   )}
                   responses="View details"
+                  onClick={() => handleSelect("Leadsconverted")}
+                  isActive={selectedCard === "Leadsconverted"}
                 />
               </div>
             )}
@@ -260,6 +322,23 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="h-full flex flex-col">
+          <div
+            onClick={() => setView(view === "chat" ? "details" : "chat")}
+            className="m-2 p-3 bg-[#062732] rounded-md text-white cursor-pointer text-center"
+          >
+            {view === "chat" ? "Open Details Panel" : "Open Chat Bot"}
+          </div>
+
+          <div className="flex-1 min-h-0">
+            {view === "chat" ? (
+              <ChatBox />
+            ) : (
+              <Details ActiveCard={selectedCard} data={selectedDetails} />
+            )}
           </div>
         </div>
       </div>

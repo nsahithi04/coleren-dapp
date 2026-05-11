@@ -60,7 +60,7 @@ export default function Feedback() {
 
   return (
     <DashboardLayout>
-      <div className="grid grid-cols-[3fr_1fr] h-full">
+      <div className="grid grid-cols-[3fr_1fr] min-h-screen">
         <div className="p-6">
           <h1 className="text-xl font-semibold text-[#062732] mb-6">
             Feedback

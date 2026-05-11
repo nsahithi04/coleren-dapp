@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const teamMemberSchema = new mongoose.Schema(
   {
-    ownerId: {
+    teamId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Team",
       required: true,
     },
 
@@ -16,7 +16,7 @@ const teamMemberSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["PRODUCT", "SALES"],
+      enum: ["OWNER", "PRODUCT", "SALES"],
       required: true,
     },
 

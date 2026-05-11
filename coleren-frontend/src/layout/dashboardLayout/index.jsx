@@ -5,7 +5,7 @@ export default function DashboardLayout({ children }) {
     <div className="flex min-h-screen">
       <Sidebar />
       <main
-        className="ml-[220px] flex-1"
+        className="ml-[220px] flex-1 h-full"
         style={{
           background:
             "linear-gradient(180.59deg, #FFFFFF -33.4%, #EBF7F4 108.11%)",

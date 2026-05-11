@@ -34,7 +34,7 @@ export default function Sequences() {
 
   return (
     <DashboardLayout>
-      <div className="p-10 flex flex-col h-full">
+      <div className="p-10 flex flex-col min-h-screen">
         <h1 className="text-2xl font-semibold mb-6">Sequences</h1>
 
         {/* TYPE */}

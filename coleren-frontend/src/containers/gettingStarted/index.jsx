@@ -77,7 +77,7 @@ export default function GettingStarted() {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto p-10">
+      <div className="mx-auto p-10 min-h-screen">
         <div className="text-[#062732] font-bold pb-5">Getting Started</div>
 
         <div className="grid gap-5 grid-cols-[2fr_1fr]">

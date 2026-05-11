@@ -1,39 +1,3 @@
-export const inviteTeam = async (data, token) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/team/invite`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) throw new Error("Failed to invite");
-
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const acceptInvite = async (token) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/team/accept`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Failed to accept invite");
-
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-  }
-};
-
 export const getTeam = async (token) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/team`, {
@@ -84,5 +48,32 @@ export const deleteMember = async (id, token) => {
     return await res.json();
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const inviteMembers = async (invites, token) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/team/invite`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: JSON.stringify({
+        invites,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (err) {
+    throw err;
   }
 };

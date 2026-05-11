@@ -9,6 +9,7 @@ export default function Frequency() {
   const [states, setStates] = useState([]);
   const [frequency, setFrequency] = useState({
     sequenceType: "",
+    frequency: "frequency",
     opportunityType: "",
     type: "",
     day: "",

@@ -8,6 +8,7 @@ export default function Rules() {
   const { type } = useParams();
   const [rule, setRule] = useState({
     sequenceType: "",
+    rule: "rule",
     type: "",
     operator: "",
     tags: [],

@@ -36,7 +36,7 @@ export default function Account() {
 
   return (
     <DashboardLayout>
-      <div className="p-10 h-full flex flex-col">
+      <div className="p-10 min-h-screen flex flex-col">
         <h1 className="text-2xl font-semibold text-[#062732] mb-6">
           My Account
         </h1>
