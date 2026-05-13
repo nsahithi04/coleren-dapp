@@ -1,0 +1,22 @@
+Coleren is an AI-powered CRM platform.
+
+Features:
+- Team management
+- AI sales insights
+- Feedback tracking
+- Meeting summaries
+- Customer analytics
+
+Pricing:
+- Starter Plan: $29/month
+- Pro Plan: $99/month
+
+Support:
+- Email: support@coleren.com
+- Response time: 24 hours
+
+Integrations:
+- Salesforce
+- HubSpot
+- Slack
+- Gmail

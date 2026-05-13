@@ -13,6 +13,7 @@ const initialState = {
   fromGoogle: false,
   isAuthenticated: false,
   isPendingOnboarding: false,
+  inviteToken: null,
 };
 
 const userSlice = createSlice({
@@ -74,6 +75,9 @@ const userSlice = createSlice({
     setPendingOnboarding: (state, action) => {
       state.isPendingOnboarding = action.payload;
     },
+    setInviteToken: (state, action) => {
+      state.inviteToken = action.payload;
+    },
 
     logoutUser: () => initialState,
   },
@@ -85,7 +89,7 @@ export const {
   setUid,
   setName,
   setEmail,
-
+  setInviteToken,
   setAuthToken,
   setRole,
   setTeamSize,

@@ -77,3 +77,31 @@ export const inviteMembers = async (invites, token) => {
     throw err;
   }
 };
+
+export const acceptInvite = async (inviteToken, token) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/team/accept`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: JSON.stringify({
+        inviteToken,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};

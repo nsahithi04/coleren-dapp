@@ -70,6 +70,7 @@ export default function SignupTwo() {
           workType,
           subscribed: user.subscribed,
           fromGoogle: user.fromGoogle,
+          inviteToken: user.inviteToken,
         },
         user.authToken,
       );

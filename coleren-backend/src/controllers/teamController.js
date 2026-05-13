@@ -1,6 +1,9 @@
 import User from "../models/User.js";
 import TeamMember from "../models/TeamMember.js";
-import Team from "../models/Team.js";
+import crypto from "crypto";
+import { sendMail } from "../middleware/mail.js";
+import existingUserInvite from "../emails/existingUserInvite.js";
+import newUserInvite from "../emails/newUserInvite.js";
 
 export const getTeam = async (req, res) => {
   try {
@@ -112,15 +115,41 @@ export const inviteMember = async (req, res) => {
         email: invite.email,
       });
 
-      if (!invitedUser) continue;
+      const token = crypto.randomBytes(32).toString("hex");
 
-      await TeamMember.create({
+      const member = await TeamMember.create({
         teamId: currentTeamMember.teamId,
         ownerId: currentTeamMember.ownerId,
-        userId: invitedUser._id,
+        userId: invitedUser?._id || null,
+        email: invite.email,
         role: invite.role.toUpperCase(),
         access: invite.access.toUpperCase(),
-        status: "ACCEPTED",
+        inviteToken: token,
+        status: "PENDING",
+      });
+
+      let inviteLink = "";
+
+      if (invitedUser) {
+        inviteLink = `${process.env.FRONTEND_URL}/accept-invite?invite=${token}`;
+      } else {
+        inviteLink = `${process.env.FRONTEND_URL}/signup?invite=${token}`;
+      }
+
+      await sendMail({
+        to: invite.email,
+
+        subject: "Team Invitation",
+
+        html: invitedUser
+          ? existingUserInvite({
+              inviteLink,
+              inviterName: currentUser.name,
+            })
+          : newUserInvite({
+              inviteLink,
+              inviterName: currentUser.name,
+            }),
       });
     }
 
@@ -132,6 +161,49 @@ export const inviteMember = async (req, res) => {
 
     res.status(500).json({
       message: "Failed to invite members",
+    });
+  }
+};
+
+export const acceptInvite = async (req, res) => {
+  try {
+    const firebaseUid = req.user.uid;
+
+    const user = await User.findOne({
+      firebaseUid,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const pendingInvite = await TeamMember.findOne({
+      inviteToken: req.body.inviteToken,
+      status: "PENDING",
+    });
+
+    if (!pendingInvite) {
+      return res.status(404).json({
+        message: "Invite not found",
+      });
+    }
+
+    pendingInvite.userId = user._id;
+
+    pendingInvite.status = "ACCEPTED";
+
+    await pendingInvite.save();
+
+    res.json({
+      message: "Invite accepted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "Failed to accept invite",
     });
   }
 };

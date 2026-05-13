@@ -2,7 +2,7 @@ import AuthLayout from "../../layout/authLayout";
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import icon from "../../components/common/icons/icon-black.svg";
 import hero from "../../components/auth/images/image-2.png";
@@ -16,6 +16,9 @@ import ErrorShow from "../../components/auth/errorBanner";
 import GoogleButton from "../../components/auth/googleBanner";
 
 export default function Signup() {
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get("invite");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,6 +55,7 @@ export default function Signup() {
         email: email,
         isPendingOnboarding: true,
         fromGoogle: false,
+        inviteToken: inviteToken,
       }),
     );
     navigate("/signup-one");

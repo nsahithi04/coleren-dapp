@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Profile from "../models/Profile.js";
+import TeamMember from "../models/TeamMember.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -58,6 +59,22 @@ export const createUser = async (req, res) => {
         workType,
         subscribed,
       });
+    }
+
+    if (req.body.inviteToken) {
+      const pendingInvite = await TeamMember.findOne({
+        inviteToken: req.body.inviteToken,
+
+        status: "PENDING",
+      });
+
+      if (pendingInvite) {
+        pendingInvite.userId = user._id;
+
+        pendingInvite.status = "ACCEPTED";
+
+        await pendingInvite.save();
+      }
     }
 
     return res.status(201).json({

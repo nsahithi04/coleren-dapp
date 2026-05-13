@@ -14,6 +14,7 @@ import Dashboard from "./containers/dashboard";
 import Feedback from "./containers/feedback";
 import Account from "./containers/account";
 import Sequences from "./containers/sequences";
+import AcceptInvite from "./containers/accept";
 
 export default function App() {
   return (
@@ -92,6 +93,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Account />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/accept-invite"
+        element={
+          <ProtectedRoute>
+            <AcceptInvite />
           </ProtectedRoute>
         }
       />

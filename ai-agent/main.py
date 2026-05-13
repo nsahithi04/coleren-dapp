@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, SystemMessage
-from tools import query_database, get_collections
+from tools import read_knowledge_base
 from prompt import system_prompt
 
 load_dotenv()
@@ -12,7 +12,7 @@ llm = ChatGoogleGenerativeAI(
     temperature=0,
 )
 
-tools = [get_collections, query_database]
+tools = [read_knowledge_base]
 
 agent = create_react_agent(
     model=llm,

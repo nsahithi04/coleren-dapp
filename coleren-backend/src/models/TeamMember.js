@@ -11,7 +11,7 @@ const teamMemberSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
     },
 
     role: {
@@ -30,6 +30,14 @@ const teamMemberSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "ACCEPTED"],
       default: "PENDING",
+    },
+
+    email: {
+      type: String,
+    },
+
+    inviteToken: {
+      type: String,
     },
   },
   { timestamps: true },
