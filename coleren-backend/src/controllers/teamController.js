@@ -1,9 +1,7 @@
 import User from "../models/User.js";
 import TeamMember from "../models/TeamMember.js";
 import crypto from "crypto";
-import { sendMail } from "../middleware/mail.js";
-import existingUserInvite from "../emails/existingUserInvite.js";
-import newUserInvite from "../emails/newUserInvite.js";
+import { sendTemplateEmail } from "../emails/sendMail.js";
 
 export const getTeam = async (req, res) => {
   try {
@@ -136,20 +134,16 @@ export const inviteMember = async (req, res) => {
         inviteLink = `${process.env.FRONTEND_URL}/signup?invite=${token}`;
       }
 
-      await sendMail({
+      await sendTemplateEmail({
         to: invite.email,
 
-        subject: "Team Invitation",
+        type: invitedUser ? "EXISTING_USER_INVITE" : "NEW_USER_INVITE",
 
-        html: invitedUser
-          ? existingUserInvite({
-              inviteLink,
-              inviterName: currentUser.name,
-            })
-          : newUserInvite({
-              inviteLink,
-              inviterName: currentUser.name,
-            }),
+        data: {
+          inviteLink,
+
+          inviterName: currentUser.name,
+        },
       });
     }
 
