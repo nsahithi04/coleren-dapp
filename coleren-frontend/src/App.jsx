@@ -16,6 +16,7 @@ import Account from "./containers/account";
 import Sequences from "./containers/sequences";
 import AcceptInvite from "./containers/accept";
 import Survey from "./containers/surveys";
+import EmailTemplate from "./containers/emailTemplate";
 
 export default function App() {
   return (
@@ -90,10 +91,18 @@ export default function App() {
         element={<Navigate to="/sequences/salesRep/overview" />}
       />
       <Route
-        path="/surveys"
+        path="/surveys/"
         element={
           <ProtectedRoute>
             <Survey />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/surveys/email"
+        element={
+          <ProtectedRoute>
+            <EmailTemplate />
           </ProtectedRoute>
         }
       />

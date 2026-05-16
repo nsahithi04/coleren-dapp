@@ -68,21 +68,24 @@ export default function Survey() {
         </div>
         <div className="bg-white p-10 rounded-xl flex-1">
           {tab == "email" ? (
-            <div className="flex items-center gap-4  px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white">
+            <button
+              onClick={() => navigate("/surveys/email")}
+              className="flex items-center gap-4  w-full px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white"
+            >
               <div>
                 <p> Email Templete</p>
                 <p className="text-xs text-gray-400">Customize your messages</p>
               </div>
-            </div>
+            </button>
           ) : (
-            <div className="flex items-center gap-4 px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white">
+            <button className="flex items-center w-full gap-4 px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white">
               <div>
                 <p> Survey Templete</p>
                 <p className="text-xs text-gray-400">
                   Questions for new leads to introduce
                 </p>
               </div>
-            </div>
+            </button>
           )}
         </div>
       </div>

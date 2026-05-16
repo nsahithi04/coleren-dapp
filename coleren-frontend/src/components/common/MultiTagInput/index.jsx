@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useRef } from "react";
 
 export default function MultiTagInput({ value = [], onChange }) {
   const [input, setInput] = useState("");
+  const inputRef = useRef(null);
 
   const removeTag = (index) => onChange(value.filter((_, i) => i !== index));
 
@@ -20,7 +22,10 @@ export default function MultiTagInput({ value = [], onChange }) {
   };
 
   return (
-    <div className="w-full border border-[#A1A1A1] rounded-lg py-1.5 px-3 flex gap-3 items-center overflow-x-auto">
+    <div
+      onClick={() => inputRef.current?.focus()}
+      className="min-h-[50px] w-full border border-[#A1A1A1] rounded-lg py-1.5 px-3 flex gap-3 items-center overflow-x-auto"
+    >
       {/* TAGS */}
       {value.map((tag, index) => (
         <div
@@ -43,11 +48,12 @@ export default function MultiTagInput({ value = [], onChange }) {
 
       {/* INPUT */}
       <input
+        ref={inputRef}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={value.length === 0 ? "Type and press Enter " : ""}
-        className="flex-shrink-0 min-w-[120px] outline-none text-sm"
+        className="flex-shrink-0 min-w-[120px] outline-none text-sm w-full"
       />
     </div>
   );

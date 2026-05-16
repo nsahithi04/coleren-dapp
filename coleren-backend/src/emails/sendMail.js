@@ -2,6 +2,7 @@ import { sendMail } from "../middleware/mail.js";
 
 import existingUserInvite from "./template/existingUserInvite.js";
 import newUserInvite from "./template/newUserInvite.js";
+import customEmail from "./template/customEmail.js";
 
 const EMAIL_TYPES = {
   EXISTING_USER_INVITE: {
@@ -15,6 +16,12 @@ const EMAIL_TYPES = {
 
     template: newUserInvite,
   },
+
+  CUSTOM: {
+    subject: "Custom Email",
+
+    template: customEmail,
+  },
 };
 
 export const sendTemplateEmail = async ({ type, to, data }) => {
@@ -27,7 +34,7 @@ export const sendTemplateEmail = async ({ type, to, data }) => {
   await sendMail({
     to,
 
-    subject: emailConfig.subject,
+    subject: data.subject || emailConfig.subject,
 
     html: emailConfig.template(data),
   });
