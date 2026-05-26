@@ -7,7 +7,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import icon from "../../components/common/icons/icon-black.svg";
 import hero from "../../components/auth/images/image-2.png";
 
-import { isValidEmail } from "@/utils/validation";
 import { setUser } from "@/store/userSlice";
 import { verifyEmail } from "@/services/userService";
 

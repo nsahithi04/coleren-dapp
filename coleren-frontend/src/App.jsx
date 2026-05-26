@@ -17,6 +17,9 @@ import Sequences from "./containers/sequences";
 import AcceptInvite from "./containers/accept";
 import Survey from "./containers/surveys";
 import EmailTemplate from "./containers/emailTemplate";
+import Connectors from "./containers/connectors";
+import SurveyForm from "./containers/surveyForm";
+import PublicSurveyForm from "./containers/public/form";
 
 export default function App() {
   return (
@@ -114,6 +117,15 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/connectors"
+        element={
+          <ProtectedRoute>
+            <Connectors />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/accept-invite"
         element={
@@ -122,6 +134,18 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/surveys/create"
+        element={
+          <ProtectedRoute>
+            <SurveyForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/survey/:surveyId" element={<PublicSurveyForm />} />
+
       <Route path="/account" element={<Navigate to="/account/profile" />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route

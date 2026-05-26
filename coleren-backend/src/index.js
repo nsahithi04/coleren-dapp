@@ -11,6 +11,7 @@ import feedbackRoutes from "./routes/feedbackRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import surveyRoutes from "./routes/surveyRoutes.js";
+import connectorRoutes from "./routes/connectorRoutes.js";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/survey", surveyRoutes);
+app.use("/api/connectors", connectorRoutes);
 
 app.use(errorHandler);
 

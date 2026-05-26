@@ -78,7 +78,10 @@ export default function Survey() {
               </div>
             </button>
           ) : (
-            <button className="flex items-center w-full gap-4 px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white">
+            <button
+              onClick={() => navigate("/surveys/create")}
+              className="flex items-center w-full gap-4 px-10 py-7 rounded-xl shadow-md transition-all text-left border-gray-100 border bg-white"
+            >
               <div>
                 <p> Survey Templete</p>
                 <p className="text-xs text-gray-400">
