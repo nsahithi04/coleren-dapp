@@ -19,7 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://coleren-dapp.web.app"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -37,6 +37,8 @@ app.use("/api/team", teamRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/survey", surveyRoutes);
 app.use("/api/connectors", connectorRoutes);
+
+app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use(errorHandler);
 
