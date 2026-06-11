@@ -110,11 +110,25 @@ aws ecs create-service \
   --load-balancers "targetGroupArn=$BACKEND_TG_ARN,containerName=backend,containerPort=5050" \
   --region $REGION > /dev/null
 
+# ── Update CloudFront origin to new ALB ──────────────────────────────────────
+CF_ID="E2VJKND1NYOUDO"
+echo "Updating CloudFront origin..."
+ETAG=$(aws cloudfront get-distribution-config --id $CF_ID --query "ETag" --output text)
+aws cloudfront get-distribution-config --id $CF_ID --query "DistributionConfig" > /tmp/cf-config.json
+python3 -c "
+import json
+with open('/tmp/cf-config.json') as f:
+    config = json.load(f)
+config['Origins']['Items'][0]['DomainName'] = '${ALB_DNS}'
+with open('/tmp/cf-config.json', 'w') as f:
+    json.dump(config, f)
+"
+aws cloudfront update-distribution --id $CF_ID --if-match "$ETAG" \
+  --distribution-config file:///tmp/cf-config.json > /dev/null
+echo "CloudFront updated (takes ~5 min to propagate)"
+
 echo ""
 echo "Resumed!"
-echo "New ALB URL: http://$ALB_DNS"
-echo ""
-echo "Update coleren-frontend/.env.production with:"
-echo "  VITE_API_URL=http://$ALB_DNS/api"
-echo "  VITE_API_BASE=http://$ALB_DNS"
-echo "Then rebuild and redeploy the frontend."
+echo "CloudFront URL (unchanged): https://dcqw9757o5e4m.cloudfront.net"
+echo "Frontend .env.production is already correct — no changes needed."
+echo "Wait ~5 minutes for CloudFront to propagate, then the site will work."
