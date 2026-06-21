@@ -93,6 +93,8 @@ export const getProfile = async (req, res) => {
     const firebaseUid = req.user.uid;
 
     const user = await User.findOne({ firebaseUid });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     const profile = await Profile.findOne({ userId: user._id });
 
     res.json({ user, profile });

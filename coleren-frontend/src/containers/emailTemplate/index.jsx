@@ -7,6 +7,7 @@ import { auth } from "../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRef } from "react";
 import { isValidEmail } from "@/utils/validation";
+import { useLocation } from "react-router-dom";
 
 const TYPES = ["Sales Rep survey", "product feedback summary"];
 
@@ -43,6 +44,10 @@ export default function EmailTemplate() {
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = useState("");
+  const location = useLocation();
+
+  const recipients = location.state?.recipients || [];
+  const surveyLink = location.state?.surveyLink || "";
 
   const editorRef = useRef(null);
 
@@ -60,6 +65,32 @@ export default function EmailTemplate() {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!surveyLink) return;
+
+    setData((prev) => ({
+      ...prev,
+      recipients,
+      body: `
+      <p>Hi,</p>
+
+      <p>You have been invited to participate in the <strong>Sales Representative Survey</strong>.</p>
+
+      <p>Please complete the survey using the link below:</p>
+
+      <p>
+        <a href="${surveyLink}" target="_blank">
+          Take Survey
+        </a>
+      </p>
+
+      <p>${surveyLink}</p>
+
+      <p>Thank you,<br />Coleren Team</p>
+    `,
+    }));
+  }, [surveyLink]);
 
   const handleSubmit = async () => {
     try {
@@ -86,6 +117,7 @@ export default function EmailTemplate() {
       );
     }
   };
+
   const updateData = (key, value) => {
     setData((prev) => ({
       ...prev,

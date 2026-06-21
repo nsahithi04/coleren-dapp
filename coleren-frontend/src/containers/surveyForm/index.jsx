@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { createSurvey } from "../../services/surveyService";
+import { useNavigate } from "react-router-dom";
 
 export default function SurveyForm() {
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
   const [token, setToken] = useState("");
+  const navigate = useNavigate();
 
   const [data, setData] = useState({
     customerName: "",
@@ -17,6 +19,22 @@ export default function SurveyForm() {
     industryType: "",
     salesRepName: "",
   });
+
+  const buildEmailBody = (surveyLink) => `
+    <p>Hi ${data.customerName},</p>
+    <p>Thank you for your time. As a valued customer of <strong>${data.productName}</strong>,
+    we'd love to hear your feedback on your recent experience with our sales team.</p>
+    <p>You have been invited to participate in the <strong>Sales Representative Survey</strong>,
+    conducted by ${data.salesRepName}.</p>
+    <p>Please complete the survey using the link below:</p>
+    <p>
+      <a href="${surveyLink}" target="_blank">
+        Take Survey
+      </a>
+    </p>
+    <p>${surveyLink}</p>
+    <p>Thank you,<br />Coleren Team</p>
+  `;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -66,13 +84,22 @@ export default function SurveyForm() {
       console.log("RESPONSE:", response);
 
       setGeneratedLink(response.surveyLink);
-
-      setSuccessOpen(true);
+      setSuccessOpen(true); // ✅ actually show the modal
     } catch (err) {
       console.log(err);
-
       setErrorMessage(err?.message || "Failed to create survey");
     }
+  };
+
+  const handleSendEmail = () => {
+    navigate("/surveys/email", {
+      state: {
+        recipients: [data.customerEmail],
+        surveyLink: generatedLink,
+        body: buildEmailBody(generatedLink),
+        subject: `Survey Invitation – ${data.productName}`,
+      },
+    });
   };
 
   return (
@@ -234,6 +261,13 @@ export default function SurveyForm() {
                 className="bg-[#25C766] text-white px-6 py-3 rounded-lg mr-3"
               >
                 Copy Link
+              </button>
+
+              <button
+                onClick={handleSendEmail}
+                className="bg-[#25C766] text-white px-6 py-3 rounded-lg mr-3"
+              >
+                Send Email
               </button>
 
               <button
