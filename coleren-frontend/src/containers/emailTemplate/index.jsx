@@ -1,11 +1,11 @@
 import DashboardLayout from "../../layout/dashboardLayout";
 import MultiTagInput from "../../components/common/MultiTagInput";
 import InviteDrop from "@/components/common/inviteDropdown";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { sendSurvey } from "../../services/surveyService";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { isValidEmail } from "@/utils/validation";
 import { useLocation } from "react-router-dom";
 
@@ -34,20 +34,22 @@ const TEMPLATE_CONTENT = {
 };
 
 export default function EmailTemplate() {
+  const location = useLocation();
+
+  const recipients = location.state?.recipients || [];
+  const draftedBody = location.state?.body || "";
+  const draftedSubject = location.state?.subject || "";
+
   const [data, setData] = useState({
-    recipients: [],
+    recipients,
     type: "Sales Rep survey",
-    subject: TEMPLATE_CONTENT["Sales Rep survey"].subject,
-    body: TEMPLATE_CONTENT["Sales Rep survey"].body,
+    subject: draftedSubject || TEMPLATE_CONTENT["Sales Rep survey"].subject,
+    body: draftedBody || TEMPLATE_CONTENT["Sales Rep survey"].body,
   });
 
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = useState("");
-  const location = useLocation();
-
-  const recipients = location.state?.recipients || [];
-  const surveyLink = location.state?.surveyLink || "";
 
   const editorRef = useRef(null);
 
@@ -65,32 +67,6 @@ export default function EmailTemplate() {
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (!surveyLink) return;
-
-    setData((prev) => ({
-      ...prev,
-      recipients,
-      body: `
-      <p>Hi,</p>
-
-      <p>You have been invited to participate in the <strong>Sales Representative Survey</strong>.</p>
-
-      <p>Please complete the survey using the link below:</p>
-
-      <p>
-        <a href="${surveyLink}" target="_blank">
-          Take Survey
-        </a>
-      </p>
-
-      <p>${surveyLink}</p>
-
-      <p>Thank you,<br />Coleren Team</p>
-    `,
-    }));
-  }, [surveyLink]);
 
   const handleSubmit = async () => {
     try {
@@ -187,15 +163,16 @@ export default function EmailTemplate() {
           <label className="text-sm font-medium">Body</label>
 
           <div
+            key={data.body}
             ref={editorRef}
             contentEditable
             suppressContentEditableWarning={true}
-            className="border border-[#A1A1A1] rounded-xl p-6 min-h-[300px] outline-none whitespace-pre-wrap"
+            className="border border-[#A1A1A1] rounded-xl p-6 min-h-[300px] outline-none [&_p]:m-0 [&_p]:mb-3"
             dangerouslySetInnerHTML={{
               __html: data.body,
             }}
             onInput={(e) => {
-              data.body = e.currentTarget.innerHTML;
+              updateData("body", e.currentTarget.innerHTML);
             }}
           />
         </div>

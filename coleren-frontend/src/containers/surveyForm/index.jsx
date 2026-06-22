@@ -20,21 +20,13 @@ export default function SurveyForm() {
     salesRepName: "",
   });
 
-  const buildEmailBody = (surveyLink) => `
-    <p>Hi ${data.customerName},</p>
-    <p>Thank you for your time. As a valued customer of <strong>${data.productName}</strong>,
-    we'd love to hear your feedback on your recent experience with our sales team.</p>
-    <p>You have been invited to participate in the <strong>Sales Representative Survey</strong>,
-    conducted by ${data.salesRepName}.</p>
-    <p>Please complete the survey using the link below:</p>
-    <p>
-      <a href="${surveyLink}" target="_blank">
-        Take Survey
-      </a>
-    </p>
-    <p>${surveyLink}</p>
-    <p>Thank you,<br />Coleren Team</p>
-  `;
+  const buildEmailBody = (surveyLink) => `<p>Hi ${data.customerName},</p>
+<p>Thank you for your time. As a valued customer of <strong>${data.productName}</strong>, we'd love to hear your feedback on your recent experience with our sales team.</p>
+<p>You have been invited to participate in the <strong>Sales Representative Survey</strong>, conducted by ${data.salesRepName}.</p>
+<p>Please complete the survey using the link below:</p>
+<p><a href="${surveyLink}" target="_blank">Take Survey</a></p>
+<p>${surveyLink}</p>
+<p>Thank you,<br />Coleren Team</p>`;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -84,7 +76,7 @@ export default function SurveyForm() {
       console.log("RESPONSE:", response);
 
       setGeneratedLink(response.surveyLink);
-      setSuccessOpen(true); // ✅ actually show the modal
+      setSuccessOpen(true);
     } catch (err) {
       console.log(err);
       setErrorMessage(err?.message || "Failed to create survey");
