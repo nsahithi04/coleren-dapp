@@ -144,11 +144,13 @@ export const updateProfile = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { firebaseUid },
       { $set: { name } },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
     const profileUpdates = {};
@@ -160,7 +162,7 @@ export const updateProfile = async (req, res) => {
     const profile = await Profile.findOneAndUpdate(
       { firebaseUid },
       { $set: profileUpdates },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     const mergedUser = {
@@ -172,6 +174,8 @@ export const updateProfile = async (req, res) => {
     res.json(mergedUser);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Update failed" });
+    res.status(500).json({
+      message: "Update failed",
+    });
   }
 };

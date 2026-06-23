@@ -31,7 +31,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/team", teamRoutes);
-app.use("/api/meeting", meetingRoutes);
+app.use("/api/meetings", meetingRoutes);
 app.use("/api/survey", surveyRoutes);
 app.use("/api/connectors", connectorRoutes);
 

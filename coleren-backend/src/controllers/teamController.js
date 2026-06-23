@@ -50,17 +50,66 @@ export const getTeam = async (req, res) => {
   }
 };
 
+async function getManageableTargetMember(req, targetId) {
+  const firebaseUid = req.user.uid;
+  const currentUser = await User.findOne({ firebaseUid });
+
+  if (!currentUser) {
+    return { error: { status: 404, message: "User not found" } };
+  }
+
+  const targetMember = await TeamMember.findById(targetId);
+
+  if (!targetMember) {
+    return { error: { status: 404, message: "Team member not found" } };
+  }
+
+  const currentTeamMember = await TeamMember.findOne({
+    userId: currentUser._id,
+    teamId: targetMember.teamId,
+    status: "ACCEPTED",
+  });
+
+  const canManage =
+    currentTeamMember?.role === "OWNER" ||
+    currentTeamMember?.access === "ADMIN";
+
+  if (!canManage) {
+    return {
+      error: {
+        status: 403,
+        message: "Not enough permission to manage team members",
+      },
+    };
+  }
+
+  return { targetMember };
+}
+
 export const updateMember = async (req, res) => {
   try {
     const { id } = req.params;
+    const { role, access } = req.body;
+
+    if (!role || !access) {
+      return res.status(400).json({
+        message: "role and access are required",
+      });
+    }
+
+    const { error, targetMember } = await getManageableTargetMember(req, id);
+
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
+    }
 
     const updated = await TeamMember.findByIdAndUpdate(
-      id,
+      targetMember._id,
       {
-        role: req.body.role.toUpperCase(),
-        access: req.body.access.toUpperCase(),
+        role: role.toUpperCase(),
+        access: access.toUpperCase(),
       },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     res.json(updated);
@@ -74,7 +123,13 @@ export const deleteMember = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await TeamMember.findByIdAndDelete(id);
+    const { error, targetMember } = await getManageableTargetMember(req, id);
+
+    if (error) {
+      return res.status(error.status).json({ message: error.message });
+    }
+
+    await TeamMember.findByIdAndDelete(targetMember._id);
 
     res.json({ message: "Deleted" });
   } catch (err) {
@@ -90,6 +145,12 @@ export const inviteMember = async (req, res) => {
     const currentUser = await User.findOne({
       firebaseUid,
     });
+
+    if (!currentUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
     const currentTeamMember = await TeamMember.findOne({
       userId: currentUser._id,
@@ -107,48 +168,60 @@ export const inviteMember = async (req, res) => {
     }
 
     const invites = req.body.invites;
+    const results = [];
 
     for (const invite of invites) {
-      const invitedUser = await User.findOne({
-        email: invite.email,
-      });
+      try {
+        const invitedUser = await User.findOne({
+          email: invite.email,
+        });
 
-      const token = crypto.randomBytes(32).toString("hex");
+        const token = crypto.randomBytes(32).toString("hex");
 
-      const member = await TeamMember.create({
-        teamId: currentTeamMember.teamId,
-        ownerId: currentTeamMember.ownerId,
-        userId: invitedUser?._id || null,
-        email: invite.email,
-        role: invite.role.toUpperCase(),
-        access: invite.access.toUpperCase(),
-        inviteToken: token,
-        status: "PENDING",
-      });
+        const member = await TeamMember.create({
+          teamId: currentTeamMember.teamId,
+          userId: invitedUser?._id || null,
+          email: invite.email,
+          role: invite.role.toUpperCase(),
+          access: invite.access.toUpperCase(),
+          inviteToken: token,
+          status: "PENDING",
+        });
 
-      let inviteLink = "";
+        let inviteLink = "";
 
-      if (invitedUser) {
-        inviteLink = `${process.env.FRONTEND_URL}/accept-invite?invite=${token}`;
-      } else {
-        inviteLink = `${process.env.FRONTEND_URL}/signup?invite=${token}`;
+        if (invitedUser) {
+          inviteLink = `${process.env.FRONTEND_URL}/accept-invite?invite=${token}`;
+        } else {
+          inviteLink = `${process.env.FRONTEND_URL}/signup?invite=${token}`;
+        }
+
+        await sendTemplateEmail({
+          to: invite.email,
+
+          type: invitedUser ? "EXISTING_USER_INVITE" : "NEW_USER_INVITE",
+
+          data: {
+            inviteLink,
+
+            inviterName: currentUser.name,
+          },
+        });
+
+        results.push({ email: invite.email, status: "sent" });
+      } catch (inviteErr) {
+        console.error(`Failed to invite ${invite.email}:`, inviteErr);
+        results.push({ email: invite.email, status: "failed" });
       }
-
-      await sendTemplateEmail({
-        to: invite.email,
-
-        type: invitedUser ? "EXISTING_USER_INVITE" : "NEW_USER_INVITE",
-
-        data: {
-          inviteLink,
-
-          inviterName: currentUser.name,
-        },
-      });
     }
 
-    res.json({
-      message: "Team members added successfully",
+    const anyFailed = results.some((r) => r.status === "failed");
+
+    res.status(anyFailed ? 207 : 200).json({
+      message: anyFailed
+        ? "Some team members could not be invited"
+        : "Team members added successfully",
+      results,
     });
   } catch (err) {
     console.error(err);

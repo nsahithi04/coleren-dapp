@@ -6,6 +6,12 @@ export const getFeedback = async (req, res) => {
     const firebaseUid = req.user.uid;
     const user = await User.findOne({ firebaseUid });
 
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     const { type } = req.query;
 
     let filter = { userId: user._id };
