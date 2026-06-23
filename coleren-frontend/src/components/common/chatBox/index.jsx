@@ -1,19 +1,19 @@
 import { useState } from "react";
 import logo from "../icons/logo.svg";
-import { useEffect } from "react";
 import { askAI } from "@/services/aiService";
 
 export default function ChatBox() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [resp, setResp] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (customInput) => {
     const value = customInput ?? input;
-    if (!value.trim()) return;
+    if (!value.trim() || isLoading) return;
 
     setMessages((prev) => [...prev, { type: "user", text: value }]);
     setInput("");
+    setIsLoading(true);
 
     try {
       const response = await askAI(value);
@@ -32,6 +32,8 @@ export default function ChatBox() {
         ...prev,
         { type: "ai", text: "Error connecting to AI" },
       ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,6 +58,14 @@ export default function ChatBox() {
               {msg.text}
             </div>
           ))}
+
+          {isLoading && (
+            <div className="self-start bg-gray-200 text-black px-4 py-2 rounded-lg max-w-[70%] flex items-center gap-1">
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -68,14 +78,16 @@ export default function ChatBox() {
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSubmit();
           }}
-          className="flex-1 outline-none bg-transparent"
+          disabled={isLoading}
+          className="flex-1 outline-none bg-transparent disabled:opacity-50"
         />
 
         <button
-          onClick={handleSubmit}
-          className="bg-[#25C766] text-white px-4 py-2 rounded-lg"
+          onClick={() => handleSubmit()}
+          disabled={isLoading}
+          className="bg-[#25C766] text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Send
+          {isLoading ? "..." : "Send"}
         </button>
       </div>
     </div>
