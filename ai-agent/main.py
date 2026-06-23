@@ -1,29 +1,30 @@
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage, SystemMessage
-from tools import read_knowledge_base
+from langchain.agents import create_agent
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import HumanMessage
+from tools import read_knowledge_base, get_schema, query_collection, get_current_datetime
 from prompt import system_prompt
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
-)
+tools = [read_knowledge_base, get_schema, query_collection, get_current_datetime]
 
-tools = [read_knowledge_base]
+checkpointer = MemorySaver()
 
-agent = create_react_agent(
-    model=llm,
+agent = create_agent(
+    model="google_genai:gemini-2.5-flash",
     tools=tools,
-    prompt=system_prompt,
+    system_prompt=system_prompt,
+    checkpointer=checkpointer,
 )
 
-def run_agent(query: str):
-    result = agent.invoke({
-        "messages": [HumanMessage(content=query)]
-    })
+def run_agent(query: str, thread_id: str = "default"):
+    config = {"configurable": {"thread_id": thread_id}}
+
+    result = agent.invoke(
+        {"messages": [HumanMessage(content=query)]},
+        config=config,
+    )
 
     for msg in reversed(result["messages"]):
         if hasattr(msg, "content") and msg.content:
