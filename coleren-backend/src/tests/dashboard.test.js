@@ -33,9 +33,6 @@ async function seedUser() {
   });
 }
 
-// Helper: create a Lead with a specific createdAt by bypassing Mongoose's
-// auto-managed timestamps (timestamps:true ignores createdAt passed to .create(),
-// so we create then patch via updateOne with strict:false-style direct write).
 async function createLeadAt(fields, createdAt) {
   const lead = await Lead.create(fields);
   if (createdAt) {
@@ -89,7 +86,7 @@ describe("POST /api/dashboard", () => {
       { userId: user._id, client: "Acme", outcome: "WIN" },
       { userId: user._id, client: "Globex", outcome: "WIN" },
       { userId: user._id, client: "Initech", outcome: "LOSS" },
-      { userId: user._id, client: "Umbrella" }, // no outcome yet
+      { userId: user._id, client: "Umbrella" },
     ]);
 
     const res = await request(app)
@@ -100,7 +97,7 @@ describe("POST /api/dashboard", () => {
     expect(res.status).toBe(200);
     expect(res.body.sales.totalLeads).toBe(4);
     expect(res.body.sales.convertedLeads).toBe(2);
-    expect(res.body.product.conversionRate).toBe(50); // 2/4 * 100
+    expect(res.body.product.conversionRate).toBe(50);
   });
 
   it("averages product scores across multiple products", async () => {
@@ -127,8 +124,8 @@ describe("POST /api/dashboard", () => {
       .send({});
 
     expect(res.status).toBe(200);
-    expect(res.body.product.productMarketScore).toBe(60); // (80+40)/2
-    expect(res.body.product.competitorScore).toBe(40); // (60+20)/2
+    expect(res.body.product.productMarketScore).toBe(60);
+    expect(res.body.product.competitorScore).toBe(40);
   });
 
   it("separates this-month leads from last-month leads and computes growth", async () => {
@@ -138,7 +135,6 @@ describe("POST /api/dashboard", () => {
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 5);
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 5);
 
-    // 4 leads this month, 2 leads last month -> growth = (4-2)/2*100 = 100%
     await createLeadAt({ userId: user._id, client: "A" }, thisMonth);
     await createLeadAt({ userId: user._id, client: "B" }, thisMonth);
     await createLeadAt({ userId: user._id, client: "C" }, thisMonth);
@@ -163,8 +159,6 @@ describe("POST /api/dashboard", () => {
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 10);
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 10);
 
-    // This month: 2 WIN out of 2. Last month: 1 WIN out of 1.
-    // convertedGrowth = (2-1)/1*100 = 100%
     await createLeadAt(
       { userId: user._id, client: "A", outcome: "WIN" },
       thisMonth,
@@ -253,7 +247,6 @@ describe("POST /api/dashboard", () => {
       .send({});
 
     expect(res.status).toBe(200);
-    // 1 rep group ("Unknown") with 1 converted -> avg = 1/1 = 1
     expect(res.body.avgConversionsPerRep).toBe(1);
   });
 
