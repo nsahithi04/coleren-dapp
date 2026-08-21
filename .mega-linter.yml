@@ -19,7 +19,10 @@ APPLY_FIXES: none
 # ENABLE_LINTERS:
 
 FILTER_REGEX_EXCLUDE: |
-  (^|/)(coverage|dist|build|node_modules)/.*
+  .*coverage/.*
+  .*build/.*
+  .*dist/.*
+  .*node_modules/.*
 
 # DISABLE:
 # - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
