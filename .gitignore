@@ -5,3 +5,14 @@ megalinter-reports/
 *.megalinter-setup.bak
 coverage/
 build/
+node_modules/
+build/
+dist/
+venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.pyc
+megalinter-reports/
+mega-linter.log
